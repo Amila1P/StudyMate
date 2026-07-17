@@ -1,41 +1,85 @@
 # StudyMate
 
-StudyMate is a notes-focused learning project with three parts:
+StudyMate is a full-stack study companion for creating, organizing, searching, deleting, and summarizing notes. It includes a static landing page, a React notes app, an Express + MongoDB backend, a Groq-powered AI summarizer, and a local MCP server for Claude Desktop.
 
-- A static marketing landing page in `landing/`
-- A React + Vite notes frontend in `client/`
-- An Express + MongoDB API in `server/`
+## Tech Stack
 
-The app lets users create, search, delete, and summarize notes. AI summarization uses Groq and returns a 3 bullet-point summary plus 1 quiz question.
-
-## Features
-
-- Responsive marketing landing page with hero and feature cards
-- React notes UI with controlled add-note form
-- Client-side search by title or subject
-- Delete note support
-- AI summarize action for each note
-- Backend API with MongoDB persistence and a fallback in-memory mode when the database is unavailable
+- Frontend: React, Vite, Vanilla CSS, Vanilla JavaScript
+- Backend: Node.js, Express, Mongoose, MongoDB
+- AI Summarization: Groq API, `groq-sdk`
+- MCP: `@modelcontextprotocol/sdk`, stdio transport
+- Tooling: npm, dotenv, CORS
 
 ## Project Structure
 
 ```text
 studymate/
-├─ landing/   # Static HTML/CSS/JS landing page
-├─ client/    # React + Vite frontend
-├─ server/    # Express + MongoDB API
-├─ mcp-server/
+├─ landing/      # Static marketing landing page
+├─ client/       # React + Vite frontend
+├─ server/       # Express + MongoDB API
+├─ mcp-server/   # Local MCP server for Claude Desktop
 └─ README.md
 ```
 
-## Prerequisites
+## Setup Steps
 
-- Node.js 18+ recommended
-- npm
-- MongoDB Atlas or local MongoDB for persistence
-- A Groq API key for AI summarization
+### Server
+
+1. Open a terminal in the `server/` folder.
+2. Install dependencies:
+
+	```bash
+	npm install
+	```
+
+3. Create a `.env` file in `server/` using the variables shown in the [Environment Variables](#environment-variables) section.
+4. Start the API:
+
+	```bash
+	npm start
+	```
+
+The backend exposes the note API, Groq summarization route, and MongoDB connection logic.
+
+### Client
+
+1. Open a terminal in the `client/` folder.
+2. Install dependencies:
+
+	```bash
+	npm install
+	```
+
+3. If needed, create `client/.env` and set `VITE_API_BASE_URL=http://localhost:5000`.
+4. Start the frontend:
+
+	```bash
+	npm run dev
+	```
+
+The React app loads notes from the backend, supports create/delete/search, and shows AI summaries and quiz questions for each note.
+
+### MCP Server
+
+1. Open a terminal in the `mcp-server/` folder.
+2. Install dependencies:
+
+	```bash
+	npm install
+	```
+
+3. Make sure `server/.env` contains the same `MONGODB_URI` used by the backend.
+4. Start the local MCP server:
+
+	```bash
+	npm start
+	```
+
+The MCP server uses stdio and provides two tools: `list_notes` and `create_note`.
 
 ## Environment Variables
+
+Use `server/.env.example` as the template for your backend environment file.
 
 ### `server/.env`
 
@@ -46,72 +90,58 @@ GROQ_API_KEY=your_groq_api_key_here
 GROQ_MODEL=llama3-8b-8192
 ```
 
-### Optional `client/.env`
+### Variable Details
 
-If your frontend is running on a different port than the backend, you can point it at the API:
+- `PORT` - Backend port for the Express API
+- `MONGODB_URI` - MongoDB connection string for Atlas or local MongoDB
+- `GROQ_API_KEY` - API key used by the AI summarization helper
+- `GROQ_MODEL` - Groq model name for summarization requests
+- `VITE_API_BASE_URL` - Optional frontend API base URL if the client is not using the default backend address
 
-```dotenv
-VITE_API_BASE_URL=http://localhost:5000
+## Screenshots
+
+Add your final screenshots in a `docs/screenshots/` folder or any folder you prefer, then update the placeholders below.
+
+### App UI
+
+![App UI placeholder](./docs/screenshots/app-ui.png)
+
+### AI Feature: Summarization Result
+
+![AI summarization placeholder](./docs/screenshots/ai-summarization.png)
+
+### MCP Tool Call: Claude Desktop Interaction
+
+![MCP tool call placeholder](./docs/screenshots/mcp-tool-call.png)
+
+## Claude Desktop MCP Configuration
+
+Add StudyMate to `claude_desktop_config.json` so Claude Desktop can start the local MCP server:
+
+```json
+{
+  "mcpServers": {
+	 "studymate": {
+		"command": "node",
+		"args": ["D:/---AMILA---/Projects/AcademyDSJ/Final_Assignment/studymate/mcp-server/index.js"],
+		"env": {
+		  "MONGODB_URI": "mongodb://localhost:27017/studymate"
+		}
+	 }
+  }
+}
 ```
 
-## Install
-
-Install dependencies separately for the backend and frontend:
-
-```bash
-cd server
-npm install
-
-cd ../client
-npm install
-```
-
-## Run the Backend
-
-```bash
-cd server
-npm start
-```
-
-The API exposes these routes:
-
-- `GET /api/notes` - fetch all notes
-- `POST /api/notes` - create a note
-- `DELETE /api/notes/:id` - delete a note
-- `POST /api/notes/:id/summarize` - summarize a note with Groq
-
-If MongoDB is unreachable, the server may start in memory mode so the app can still run, but data will not persist.
-
-## Run the React App
-
-```bash
-cd client
-npm run dev
-```
-
-The React app loads notes from the backend, supports add/delete/search, and shows AI summaries and quiz questions on each note card.
-
-## Run the Landing Page
-
-Open `landing/index.html` directly in a browser, or serve the `landing/` folder with any static file server.
-
-## AI Summarization Flow
-
-- The backend reads the note content
-- The Groq client is created in `server/lib/openai.js`
-- The model is prompted for:
-	- 3 bullet-point summary
-	- 1 quiz question
-- The response is saved back into the note document as `summary` and `quizQuestion`
+If your MongoDB connection string is different, update the `env` value to match the same database used by the backend.
 
 ## Notes
 
-- The frontend expects note documents to include `_id`, `title`, `subject`, `content`, `summary`, and `quizQuestion`
-- The summarize button on each note shows a loading state while the request is running
-- The backend validates that `title` and `content` are not empty before creating a note
+- The backend can start in a fallback in-memory mode if MongoDB is unavailable, but data will not persist.
+- The frontend expects note documents to include `_id`, `title`, `subject`, `content`, `summary`, and `quizQuestion`.
+- The AI summary action returns a 3 bullet-point summary and 1 quiz question.
 
-## Troubleshooting
+## Run Summary
 
-- If the backend cannot connect to MongoDB Atlas, check your connection string, IP allowlist, and network access
-- If summarization fails, confirm `GROQ_API_KEY` is set in `server/.env`
-- If the frontend cannot reach the API, verify `VITE_API_BASE_URL` and the backend port
+- Server: `cd server && npm start`
+- Client: `cd client && npm run dev`
+- MCP Server: `cd mcp-server && npm start`
