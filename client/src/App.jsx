@@ -2,13 +2,15 @@ import { useEffect, useMemo, useState } from 'react';
 import NoteForm from './components/NoteForm';
 import NoteCard from './components/NoteCard';
 
-const NOTES_API_URL = 'https://jsonplaceholder.typicode.com/posts?_limit=6';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000';
+const NOTES_API_URL = `${API_BASE_URL}/api/notes`;
 
 export default function App() {
   const [notes, setNotes] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [loading, setLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState('');
+  const [summarizingNoteId, setSummarizingNoteId] = useState(null);
 
   useEffect(() => {
     const loadNotes = async () => {
@@ -22,16 +24,7 @@ export default function App() {
         }
 
         const data = await response.json();
-        const normalizedNotes = Array.isArray(data)
-          ? data.map((item) => ({
-              id: item.id,
-              title: item.title,
-              subject: `Subject ${item.userId ?? 1}`,
-              content: item.body,
-            }))
-          : [];
-
-        setNotes(normalizedNotes);
+        setNotes(Array.isArray(data) ? data : []);
       } catch (error) {
         setErrorMessage('Unable to load notes right now.');
         setNotes([]);
@@ -57,18 +50,65 @@ export default function App() {
     });
   }, [notes, searchTerm]);
 
-  const handleAddNote = (newNote) => {
-    setNotes((currentNotes) => [
-      {
-        id: Date.now(),
-        ...newNote,
-      },
-      ...currentNotes,
-    ]);
+  const handleAddNote = async (newNote) => {
+    try {
+      const response = await fetch(NOTES_API_URL, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(newNote),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to create note');
+      }
+
+      const createdNote = await response.json();
+      setNotes((currentNotes) => [createdNote, ...currentNotes]);
+    } catch (error) {
+      setErrorMessage('Unable to add note right now.');
+    }
   };
 
-  const handleDeleteNote = (noteId) => {
-    setNotes((currentNotes) => currentNotes.filter((note) => note.id !== noteId));
+  const handleDeleteNote = async (noteId) => {
+    try {
+      const response = await fetch(`${NOTES_API_URL}/${noteId}`, {
+        method: 'DELETE',
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to delete note');
+      }
+
+      setNotes((currentNotes) => currentNotes.filter((note) => note._id !== noteId));
+    } catch (error) {
+      setErrorMessage('Unable to delete note right now.');
+    }
+  };
+
+  const handleSummarizeNote = async (noteId) => {
+    setSummarizingNoteId(noteId);
+
+    try {
+      const response = await fetch(`${NOTES_API_URL}/${noteId}/summarize`, {
+        method: 'POST',
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to summarize note');
+      }
+
+      const updatedNote = await response.json();
+
+      setNotes((currentNotes) =>
+        currentNotes.map((note) => (note._id === noteId ? updatedNote : note)),
+      );
+    } catch (error) {
+      setErrorMessage('Unable to summarize note right now.');
+    } finally {
+      setSummarizingNoteId(null);
+    }
   };
 
   return (
@@ -115,7 +155,13 @@ export default function App() {
           ) : (
             <div className="notes-list">
               {filteredNotes.map((note) => (
-                <NoteCard key={note.id} note={note} onDelete={handleDeleteNote} />
+                <NoteCard
+                  key={note._id}
+                  note={note}
+                  onDelete={handleDeleteNote}
+                  onSummarize={handleSummarizeNote}
+                  isSummarizing={summarizingNoteId === note._id}
+                />
               ))}
             </div>
           )}

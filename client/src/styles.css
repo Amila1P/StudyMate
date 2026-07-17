@@ -217,6 +217,13 @@ button {
   letter-spacing: 0.06em;
 }
 
+.note-card__actions {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  flex-wrap: wrap;
+}
+
 .note-card h3 {
   margin: 0 0 0.6rem;
   font-size: 1.12rem;
@@ -234,6 +241,50 @@ button {
   border-radius: 999px;
   padding: 0.45rem 0.8rem;
   transition: transform 0.18s ease, background-color 0.18s ease;
+}
+
+.summarize-button {
+  border: 1px solid rgba(136, 187, 255, 0.25);
+  background: rgba(136, 187, 255, 0.12);
+  color: #d5e6ff;
+  border-radius: 999px;
+  padding: 0.45rem 0.85rem;
+  transition: transform 0.18s ease, background-color 0.18s ease, opacity 0.18s ease;
+}
+
+.summarize-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.7;
+  transform: none;
+}
+
+.note-ai-block {
+  margin-top: 1rem;
+  padding-top: 0.9rem;
+  border-top: 1px solid rgba(161, 184, 240, 0.16);
+}
+
+.note-ai-block h4 {
+  margin: 0 0 0.55rem;
+  color: #9cc0ff;
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.note-ai-block ul {
+  margin: 0;
+  padding-left: 1.15rem;
+  color: rgba(232, 238, 252, 0.88);
+}
+
+.note-ai-block li + li {
+  margin-top: 0.35rem;
+}
+
+.quiz-block p {
+  margin: 0;
+  color: rgba(232, 238, 252, 0.88);
 }
 
 .state-message {
