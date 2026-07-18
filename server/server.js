@@ -115,7 +115,9 @@ async function connectToDatabase() {
 	const directUri = buildDirectAtlasUri(MONGODB_URI);
 
 	if (!directUri) {
-		throw new Error('Unable to build a direct Atlas fallback URI from MONGODB_URI.');
+		useMemoryStore = true;
+		console.warn('[MongoDB] No Atlas fallback URI could be built. Using an in-memory notes store.');
+		return;
 	}
 
 	console.warn('[MongoDB] Trying direct Atlas host fallback URI...');
