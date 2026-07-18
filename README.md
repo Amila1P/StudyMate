@@ -28,16 +28,16 @@ studymate/
 1. Open a terminal in the `server/` folder.
 2. Install dependencies:
 
-	```bash
-	npm install
-	```
+   ```bash
+   npm install
+   ```
 
 3. Create a `.env` file in `server/` using the variables shown in the [Environment Variables](#environment-variables) section.
 4. Start the API:
 
-	```bash
-	npm start
-	```
+   ```bash
+   npm start
+   ```
 
 The backend exposes the note API, Groq summarization route, and MongoDB connection logic.
 
@@ -46,16 +46,16 @@ The backend exposes the note API, Groq summarization route, and MongoDB connecti
 1. Open a terminal in the `client/` folder.
 2. Install dependencies:
 
-	```bash
-	npm install
-	```
+   ```bash
+   npm install
+   ```
 
 3. If needed, create `client/.env` and set `VITE_API_BASE_URL=http://localhost:5000`.
 4. Start the frontend:
 
-	```bash
-	npm run dev
-	```
+   ```bash
+   npm run dev
+   ```
 
 The React app loads notes from the backend, supports create/delete/search, and shows AI summaries and quiz questions for each note.
 
@@ -64,16 +64,16 @@ The React app loads notes from the backend, supports create/delete/search, and s
 1. Open a terminal in the `mcp-server/` folder.
 2. Install dependencies:
 
-	```bash
-	npm install
-	```
+   ```bash
+   npm install
+   ```
 
 3. Make sure `server/.env` contains the same `MONGODB_URI` used by the backend.
 4. Start the local MCP server:
 
-	```bash
-	npm start
-	```
+   ```bash
+   npm start
+   ```
 
 The MCP server uses stdio and provides two tools: `list_notes` and `create_note`.
 
@@ -87,7 +87,7 @@ Use `server/.env.example` as the template for your backend environment file.
 PORT=5000
 MONGODB_URI=mongodb://localhost:27017/studymate
 GROQ_API_KEY=your_groq_api_key_here
-GROQ_MODEL=llama3-8b-8192
+GROQ_MODEL=openai/gpt-oss-20b
 ```
 
 ### Variable Details
@@ -104,10 +104,12 @@ Add your final screenshots in a `docs/screenshots/` folder or any folder you pre
 
 ### App UI
 
+![alt text](image.png)
 ![App UI placeholder](./docs/screenshots/app-ui.png)
 
 ### AI Feature: Summarization Result
 
+![alt text](image-1.png)
 ![AI summarization placeholder](./docs/screenshots/ai-summarization.png)
 
 ### MCP Tool Call: Claude Desktop Interaction
@@ -121,13 +123,15 @@ Add StudyMate to `claude_desktop_config.json` so Claude Desktop can start the lo
 ```json
 {
   "mcpServers": {
-	 "studymate": {
-		"command": "node",
-		"args": ["D:/---AMILA---/Projects/AcademyDSJ/Final_Assignment/studymate/mcp-server/index.js"],
-		"env": {
-		  "MONGODB_URI": "mongodb://localhost:27017/studymate"
-		}
-	 }
+    "studymate": {
+      "command": "node",
+      "args": [
+        "D:/---AMILA---/Projects/AcademyDSJ/Final_Assignment/studymate/mcp-server/index.js"
+      ],
+      "env": {
+        "MONGODB_URI": "mongodb://localhost:27017/studymate"
+      }
+    }
   }
 }
 ```

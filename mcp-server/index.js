@@ -1,6 +1,7 @@
 const path = require('path');
 const mongoose = require('mongoose');
 const dotenv = require('dotenv');
+const { z } = require('zod');
 const { McpServer } = require('@modelcontextprotocol/sdk/server/mcp.js');
 const { StdioServerTransport } = require('@modelcontextprotocol/sdk/server/stdio.js');
 
@@ -34,11 +35,6 @@ const server = new McpServer({
 server.tool(
   'list_notes',
   'Fetch all notes from the StudyMate database.',
-  {
-    type: 'object',
-    properties: {},
-    additionalProperties: false,
-  },
   async () => {
     await connectToDatabase();
 
@@ -59,25 +55,9 @@ server.tool(
   'create_note',
   'Create a new StudyMate note in MongoDB.',
   {
-    type: 'object',
-    properties: {
-      title: {
-        type: 'string',
-        minLength: 1,
-        description: 'The note title.',
-      },
-      subject: {
-        type: 'string',
-        description: 'The note subject.',
-      },
-      content: {
-        type: 'string',
-        minLength: 1,
-        description: 'The note content.',
-      },
-    },
-    required: ['title', 'content'],
-    additionalProperties: false,
+    title: z.string().trim().min(1).describe('The note title.'),
+    subject: z.string().optional().describe('The note subject.'),
+    content: z.string().trim().min(1).describe('The note content.'),
   },
   async ({ title, subject = '', content }) => {
     await connectToDatabase();

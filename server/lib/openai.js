@@ -1,5 +1,17 @@
 const Groq = require('groq-sdk');
 
+const DEFAULT_GROQ_MODEL = 'openai/gpt-oss-20b';
+
+function resolveGroqModel() {
+  const configuredModel = process.env.GROQ_MODEL?.trim();
+
+  if (!configuredModel || configuredModel === 'llama3-8b-8192') {
+    return DEFAULT_GROQ_MODEL;
+  }
+
+  return configuredModel;
+}
+
 function createAiClient() {
   const apiKey = process.env.GROQ_API_KEY;
 
@@ -12,9 +24,10 @@ function createAiClient() {
 
 async function generateNoteSummary(noteContent) {
   const client = createAiClient();
+  const model = resolveGroqModel();
 
   const completion = await client.chat.completions.create({
-    model: process.env.GROQ_MODEL || 'llama3-8b-8192',
+    model,
     messages: [
       {
         role: 'system',
